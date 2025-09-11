@@ -1,4 +1,3 @@
-import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createCabin } from "../../services/apiCabins";
@@ -106,7 +105,12 @@ function CreateCabinForm() {
                         'discount',
                         {
                             required: "This field is required",
-                            validate: value => value > getValues().regularPrice || "Price needs to be less than regular price"
+                            validate: (value) => {
+                                if (parseFloat(value) <= parseFloat(getValues().regularPrice))
+                                    return true;
+                                else
+                                    return "Discount needs to be less than regular price";
+                            },
                         }
                     )}
                 />
