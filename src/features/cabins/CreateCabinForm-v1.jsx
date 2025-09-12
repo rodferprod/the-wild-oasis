@@ -10,27 +10,19 @@ import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
 import toast from "react-hot-toast";
 
-function CreateCabinForm({ cabinToEdit = {}, setShowForm = null }) {
-
-    const { id: editId, ...editValues } = cabinToEdit;
-
-    const isEditSection = Boolean(editId);
-
+function CreateCabinForm() {
     const {
         register,
         handleSubmit,
         reset,
         getValues,
         formState: { errors }
-    } = useForm({
-        defaultValues: isEditSection ? editValues : {}
-    });
-
+    } = useForm();
 
     const queryClient = useQueryClient();
 
     const {
-        mutate: createCabin,
+        mutate,
         isLoading: isCreating
     } = useMutation({
         // (newCabin) => createEditCabin(newCabin),
@@ -47,30 +39,8 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm = null }) {
         }
     });
 
-    const {
-        mutate: editCabin,
-        isLoading: isEditing
-    } = useMutation({
-        mutationFn: ({ newCabinInfo, id }) => createEditCabin(newCabinInfo, id),
-        onSuccess: () => {
-            toast.success("Cabin successfully edited");
-            queryClient.invalidateQueries({
-                queryKey: ['cabins']
-            });
-            if (isEditSection) setShowForm((showForm) => !showForm);
-            else reset();
-        },
-        onError: (err) => {
-            toast.error(err.message);
-        }
-    });
-
-    const isWorking = isCreating || isEditing;
-
     function submitForm(data) {
-        const image = typeof data.image === 'string' ? data.image : data.image[0];
-
-        isEditSection ? editCabin({ newCabinInfo: { ...data, image }, id: editId }) : createCabin({ ...data, image: image });
+        mutate({ ...data, image: data.image[0] });
     }
 
     function errorSubmit(errors) {
@@ -83,7 +53,7 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm = null }) {
                 <Input
                     type="text"
                     id="name"
-                    disabled={isWorking}
+                    disabled={isCreating}
                     {...register(
                         'name',
                         {
@@ -97,7 +67,7 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm = null }) {
                 <Input
                     type="number"
                     id="maxCapacity"
-                    disabled={isWorking}
+                    disabled={isCreating}
                     {...register(
                         'maxCapacity',
                         {
@@ -115,7 +85,7 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm = null }) {
                 <Input
                     type="number"
                     id="regularPrice"
-                    disabled={isWorking}
+                    disabled={isCreating}
                     {...register(
                         'regularPrice',
                         {
@@ -129,7 +99,7 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm = null }) {
                 <Input
                     type="number"
                     id="discount"
-                    disabled={isWorking}
+                    disabled={isCreating}
                     defaultValue={0}
                     {...register(
                         'discount',
@@ -150,7 +120,7 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm = null }) {
                 <Textarea
                     type="number"
                     id="description"
-                    disabled={isWorking}
+                    disabled={isCreating}
                     defaultValue=""
                     {...register(
                         'description',
@@ -167,11 +137,10 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm = null }) {
                     accept="image/*"
                     {...register('image',
                         {
-                            required: isEditSection && getValues().image ? false : "This field is required",
+                            required: "This field is required",
                         }
                     )}
                 />
-                {typeof getValues().image === "string" && <input type="hidden" id="actualImage" {...register("actualImage")} value={getValues().image} />}
             </FormRow>
 
             <FormRow>
@@ -179,8 +148,7 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm = null }) {
                 <Button variation="secondary" type="reset">
                     Cancel
                 </Button>
-                <Button disabled={isWorking}>
-                    {isEditSection ? 'Edit cabin' : 'Create new cabin'}</Button>
+                <Button disabled={isCreating}>Edit cabin</Button>
             </FormRow>
         </Form>
     );
