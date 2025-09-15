@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createEditCabin } from "../../services/apiCabins";
+import { useCreateCabin } from "./useCreateCabin";
+import { useEditCabin } from "./useEditCabin";
 
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
@@ -8,12 +8,14 @@ import FormRow from "../../ui/FormRow";
 import Button from "../../ui/Button";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
-import toast from "react-hot-toast";
 
-function CreateCabinForm({ cabinToEdit = {}, setShowForm = null }) {
+function CreateEditCabinForm({ cabinToEdit = {}, setShowForm = null }) {
+
+    const { isCreating, createCabin } = useCreateCabin();
+    const { isEditing, editCabin } = useEditCabin();
+    const isWorking = isCreating || isEditing;
 
     const { id: editId, ...editValues } = cabinToEdit;
-
     const isEditSection = Boolean(editId);
 
     const {
@@ -26,51 +28,33 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm = null }) {
         defaultValues: isEditSection ? editValues : {}
     });
 
-
-    const queryClient = useQueryClient();
-
-    const {
-        mutate: createCabin,
-        isLoading: isCreating
-    } = useMutation({
-        // (newCabin) => createEditCabin(newCabin),
-        mutationFn: createEditCabin,
-        onSuccess: () => {
-            toast.success("New cabin successfully created");
-            queryClient.invalidateQueries({
-                queryKey: ['cabins']
-            });
-            reset();
-        },
-        onError: (err) => {
-            toast.error(err.message);
-        }
-    });
-
-    const {
-        mutate: editCabin,
-        isLoading: isEditing
-    } = useMutation({
-        mutationFn: ({ newCabinInfo, id }) => createEditCabin(newCabinInfo, id),
-        onSuccess: () => {
-            toast.success("Cabin successfully edited");
-            queryClient.invalidateQueries({
-                queryKey: ['cabins']
-            });
-            if (isEditSection) setShowForm((showForm) => !showForm);
-            else reset();
-        },
-        onError: (err) => {
-            toast.error(err.message);
-        }
-    });
-
-    const isWorking = isCreating || isEditing;
-
     function submitForm(data) {
         const image = typeof data.image === 'string' ? data.image : data.image[0];
 
-        isEditSection ? editCabin({ newCabinInfo: { ...data, image }, id: editId }) : createCabin({ ...data, image: image });
+        isEditSection ?
+            editCabin(
+                {
+                    newCabinInfo: { ...data, image },
+                    id: editId
+                },
+                {
+                    onSuccess: () => {
+                        if (isEditSection)
+                            setShowForm((showForm) => !showForm);
+                        else
+                            reset();
+                    }
+                }
+            )
+            : createCabin(
+                {
+                    ...data,
+                    image: image
+                },
+                {
+                    onSuccess: () => { reset(); }
+                }
+            );
     }
 
     function errorSubmit(errors) {
@@ -186,4 +170,4 @@ function CreateCabinForm({ cabinToEdit = {}, setShowForm = null }) {
     );
 }
 
-export default CreateCabinForm;
+export default CreateEditCabinForm;

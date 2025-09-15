@@ -10,7 +10,7 @@ import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
 import toast from "react-hot-toast";
 
-function CreateCabinForm() {
+function CreateEditCabinForm() {
     const {
         register,
         handleSubmit,
@@ -154,4 +154,4 @@ function CreateCabinForm() {
     );
 }
 
-export default CreateCabinForm;
+export default CreateEditCabinForm;
