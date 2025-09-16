@@ -28,12 +28,16 @@ export async function deleteCabin(cabin) {
 }
 
 export async function createEditCabin(newCabin, id) {
-	// For creation action we'll not have an image
-	let hasImageURL = false;
+	let hasImageURL;
 
-	// 1. Check if it is an edit action and if image didn't changes
-	if (id)
+	// 1. Check if has an ID for edition and if has an image change
+	if (id) {
 		hasImageURL = typeof newCabin.image === "string" && newCabin.image === newCabin.actualImage;
+	} else {
+		// 1.1 If image is a string it means a duplicate
+		// if not it's a cabin creation
+		hasImageURL = typeof newCabin.image === "string";
+	}
 
 	let imageURL = "",
 		imageName = "",
