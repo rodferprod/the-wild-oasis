@@ -9,7 +9,7 @@ import Button from "../../ui/Button";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
 
-function CreateEditCabinForm({ cabinToEdit = {}, setShowForm = null }) {
+function CreateEditCabinForm({ cabinToEdit = {}, setShowForm = null, onCloseModal }) {
 
     const { isCreating, createCabin } = useCreateCabin();
     const { isEditing, editCabin } = useEditCabin();
@@ -39,10 +39,8 @@ function CreateEditCabinForm({ cabinToEdit = {}, setShowForm = null }) {
                 },
                 {
                     onSuccess: () => {
-                        if (isEditSection)
-                            setShowForm((showForm) => !showForm);
-                        else
-                            reset();
+                        reset();
+                        onCloseModal?.();
                     }
                 }
             )
@@ -52,7 +50,10 @@ function CreateEditCabinForm({ cabinToEdit = {}, setShowForm = null }) {
                     image: image
                 },
                 {
-                    onSuccess: () => { reset(); }
+                    onSuccess: () => {
+                        reset();
+                        onCloseModal?.();
+                    }
                 }
             );
     }
@@ -63,7 +64,7 @@ function CreateEditCabinForm({ cabinToEdit = {}, setShowForm = null }) {
 
     return (
         <Form onSubmit={handleSubmit(submitForm, errorSubmit)}>
-            <FormRow label="Cabin name" error={errors?.name?.message}>
+            <FormRow label="Cabin name" error={errors?.name?.message} type={onCloseModal ? "modal" : "regular"}>
                 <Input
                     type="text"
                     id="name"
@@ -160,7 +161,7 @@ function CreateEditCabinForm({ cabinToEdit = {}, setShowForm = null }) {
 
             <FormRow>
                 {/* type is an HTML attribute! */}
-                <Button variation="secondary" type="reset">
+                <Button onClick={isEditSection ? () => setShowForm(show => !show) : () => onCloseModal?.()} variation="secondary" type={isEditSection ? "button" : "reset"}>
                     Cancel
                 </Button>
                 <Button disabled={isWorking}>
