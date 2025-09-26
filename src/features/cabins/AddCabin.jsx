@@ -1,24 +1,24 @@
 import CreateEditCabinForm from "./CreateEditCabinForm";
 import Button from "../../ui/Button";
-import { useState } from "react";
 import Modal from "../../ui/Modal";
+import CabinTable from "./CabinTable";
 
 function AddCabin() {
-    const [isOpenModal, setIsOpenModal] = useState(false);
-    return (
-        <div>
-            <Button onClick={() => {
-                setIsOpenModal((isOpen) => !isOpen)
-            }}>
-                Add new cabin
-            </Button>
-            {isOpenModal &&
-                <Modal onClose={() => setIsOpenModal(false)}>
-                    <CreateEditCabinForm onCloseModal={() => setIsOpenModal(false)} />
-                </Modal>
-            }
-        </div>
-    )
+    return <Modal>
+        <Modal.Open opens='cabin-form'>
+            <Button>Add new cabin</Button>
+        </Modal.Open>
+        <Modal.Window name='cabin-form'>
+            <CreateEditCabinForm />
+        </Modal.Window>
+
+        <Modal.Open opens='table-list'>
+            <Button>List Cabins</Button>
+        </Modal.Open>
+        <Modal.Window name='table-list'>
+            <CabinTable />
+        </Modal.Window>
+    </Modal>
 }
 
 export default AddCabin
