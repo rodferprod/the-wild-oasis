@@ -9,7 +9,7 @@ import Button from "../../ui/Button";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
 
-function CreateEditCabinForm({ cabinToEdit = {}, setShowForm = null, onCloseModal }) {
+function CreateEditCabinForm({ cabinToEdit = {}, onCloseModal }) {
 
     const { isCreating, createCabin } = useCreateCabin();
     const { isEditing, editCabin } = useEditCabin();
@@ -161,7 +161,7 @@ function CreateEditCabinForm({ cabinToEdit = {}, setShowForm = null, onCloseModa
 
             <FormRow>
                 {/* type is an HTML attribute! */}
-                <Button onClick={isEditSection ? () => setShowForm(show => !show) : () => onCloseModal?.()} variation="secondary" type={isEditSection ? "button" : "reset"}>
+                <Button onClick={() => onCloseModal?.()} variation="secondary" type={isEditSection ? "button" : "reset"}>
                     Cancel
                 </Button>
                 <Button disabled={isWorking}>
