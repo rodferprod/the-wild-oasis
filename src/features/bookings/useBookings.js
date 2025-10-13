@@ -7,7 +7,6 @@ export function useBookings() {
 
 	// Filter
 	const filterValue = searchParams.get("status");
-
 	const filter =
 		!filterValue || filterValue === "all"
 			? null
@@ -16,13 +15,18 @@ export function useBookings() {
 					value: filterValue,
 			  };
 
+	// Sort
+	const sortByValue = searchParams.get("sortBy") || "startDate-desc";
+	const [field, direction] = sortByValue.split("-");
+	const sortBy = { field, direction };
+
 	const {
 		error,
 		isLoading,
 		data: bookings,
 	} = useQuery({
-		queryKey: ["bookings", filter],
-		queryFn: () => getBookings({ filter }),
+		queryKey: ["bookings", filter, sortBy],
+		queryFn: () => getBookings({ filter, sortBy }),
 	});
 
 	return { isLoading, error, bookings };
