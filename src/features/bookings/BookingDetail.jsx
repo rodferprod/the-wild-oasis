@@ -9,6 +9,8 @@ import Button from "../../ui/Button";
 import ButtonText from "../../ui/ButtonText";
 
 import { useMoveBack } from "../../hooks/useMoveBack";
+import { useBooking } from "./useBooking";
+import Spinner from "../../ui/Spinner";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -17,36 +19,40 @@ const HeadingGroup = styled.div`
 `;
 
 function BookingDetail() {
-  const booking = {};
-  const status = "checked-in";
+    const { booking, isLoading } = useBooking();
 
-  const moveBack = useMoveBack();
+    const moveBack = useMoveBack();
 
-  const statusToTagName = {
-    unconfirmed: "blue",
-    "checked-in": "green",
-    "checked-out": "silver",
-  };
+    if (isLoading) return <Spinner />;
 
-  return (
-    <>
-      <Row type="horizontal">
-        <HeadingGroup>
-          <Heading as="h1">Booking #X</Heading>
-          <Tag type={statusToTagName[status]}>{status.replace("-", " ")}</Tag>
-        </HeadingGroup>
-        <ButtonText onClick={moveBack}>&larr; Back</ButtonText>
-      </Row>
+    const { status, id: bookingId } = booking;
 
-      <BookingDataBox booking={booking} />
 
-      <ButtonGroup>
-        <Button variation="secondary" onClick={moveBack}>
-          Back
-        </Button>
-      </ButtonGroup>
-    </>
-  );
+    const statusToTagName = {
+        unconfirmed: "blue",
+        "checked-in": "green",
+        "checked-out": "silver",
+    };
+
+    return (
+        <>
+            <Row type="horizontal">
+                <HeadingGroup>
+                    <Heading as="h1">Booking #{bookingId}</Heading>
+                    <Tag type={statusToTagName[status]}>{status.replace("-", " ")}</Tag>
+                </HeadingGroup>
+                <ButtonText onClick={moveBack}>&larr; Back</ButtonText>
+            </Row>
+
+            <BookingDataBox booking={booking} />
+
+            <ButtonGroup>
+                <Button variation="secondary" onClick={moveBack}>
+                    Back
+                </Button>
+            </ButtonGroup>
+        </>
+    );
 }
 
 export default BookingDetail;
