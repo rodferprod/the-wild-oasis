@@ -10,7 +10,7 @@ export function useLogin() {
 		mutationFn: ({ email, password }) => loginAPI({ email, password }),
 		onSuccess: (user) => {
 			// OBS: We can set user data to the cache imediately after login
-			queryClient.setQueriesData(["user"], user);
+			queryClient.setQueryData(["user"], user.user);
 			// It'll avoid the useUser hook to make another request to the API when the ProtectedRoute component is rendered
 			// Then, it'll get the user data from the cache
 
